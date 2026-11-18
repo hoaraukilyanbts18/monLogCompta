@@ -1,0 +1,424 @@
+Cahier des charges – MonLogCompta
+1. Présentation du projet
+1.1 Contexte
+Les petites entreprises et les indépendants doivent suivre leurs clients, leurs produits, leurs factures et leurs opérations comptables, avec des obligations croissantes en matière de facturation électronique. Les logiciels du marché sont souvent coûteux ou trop complexes pour leurs besoins.
+Le projet MonLogCompta consiste à développer une application de bureau en Java destinée à ces petites structures, pour simplifier la gestion de leurs clients, produits, factures et opérations comptables.
+1.2 Objectif principal
+Concevoir une application de bureau permettant à un utilisateur de :
+gérer ses clients ;
+gérer ses produits et prestations ;
+créer des factures ;
+calculer automatiquement les montants ;
+appliquer des remises ;
+calculer la TVA ;
+calculer les marges ;
+suivre les paiements ;
+générer les écritures comptables ;
+exporter les factures en JSON ;
+générer une facture électronique XML/UBL ;
+simuler la transmission d'une facture électronique ;
+consulter l'historique des transmissions.
+1.3 Objectifs pédagogiques
+Mettre en œuvre une démarche de développement complète (analyse, conception, réalisation, tests, documentation).
+Maîtriser la programmation orientée objet en Java et l'accès à une base de données relationnelle.
+Manipuler des formats d'échange structurés (JSON, XML/UBL).
+Appliquer des règles de gestion comptable et fiscale.
+
+
+2. Périmètre du projet
+2.1 Inclus
+Application de bureau Java avec interface graphique.
+Base de données relationnelle locale (clients, produits, factures, paiements, écritures, transmissions).
+Calculs automatiques : montants HT, remises, TVA, TTC, marges.
+Génération des écritures comptables associées aux factures et aux paiements.
+Exports de factures en JSON et en XML/UBL.
+Plateforme de facturation électronique fictive simulant l'envoi d'une facture et le retour (acceptée ou rejetée).
+Historique des transmissions.
+2.2 Exclus
+Connexion à une véritable plateforme de facturation (PDP / portail public).
+Télédéclaration de TVA et liasses fiscales.
+Application web ou mobile, gestion multi-utilisateurs en réseau.
+Gestion de la paie, des stocks et de la trésorerie bancaire (rapprochement bancaire).
+Ces exclusions peuvent constituer des évolutions futures.
+3. Utilisateurs et profils
+L'application est conçue pour un utilisateur principal (le gestionnaire de l'entreprise). Une évolution possible est de distinguer deux profils :
+Profil
+Droits
+Gestionnaire
+Accès complet : clients, produits, factures, paiements, comptabilité, exports, transmissions
+Consultation (optionnel)
+Lecture seule des données et de l'historique
+
+4. Exigences fonctionnelles
+Exigences numérotées en (EF) pour faire plus simple et rendre plus traçable avec les tests et la recette. Priorité : M = indispensable, S = souhaitable, C = confort.
+4.1 Gestion des clients
+Réf.
+Exigence
+Priorité
+EF-01
+Créer, modifier, consulter et supprimer (ou archiver) un client
+M
+EF-02
+Renseigner : raison sociale ou nom, adresse, SIREN/SIRET, n° de TVA intracommunautaire, e-mail, téléphone, conditions de paiement
+M
+EF-03
+Rechercher et filtrer les clients (nom, ville, SIRET)
+M
+EF-04
+Interdire la suppression d'un client ayant des factures (archivage à la place)
+M
+EF-05
+Contrôler la validité du format du SIRET et de l'e-mail
+S
+
+4.2 Gestion des produits et prestations
+Réf.
+Exigence
+Priorité
+EF-06
+Créer, modifier, consulter et archiver un produit ou une prestation
+M
+EF-07
+Renseigner : référence, désignation, type (produit / prestation), prix de vente HT, coût d'achat HT, taux de TVA, unité
+M
+EF-08
+Rechercher et filtrer le catalogue
+M
+EF-09
+Afficher la marge unitaire (prix de vente – coût d'achat)
+S
+
+4.3 Création et gestion des factures
+Réf.
+Exigence
+Priorité
+EF-10
+Créer une facture pour un client : date d'émission, date d'échéance, lignes (produit/prestation, quantité, prix, remise, TVA)
+M
+EF-11
+Numérotation automatique, unique et chronologique des factures (ex. FA-2026-0001)
+M
+EF-12
+Statuts de facture : brouillon, validée, transmise, acceptée, rejetée, payée partiellement, payée, annulée
+M
+EF-13
+Modifier une facture uniquement à l'état brouillon ; une facture validée n'est plus modifiable (création d'un avoir pour corriger)
+M
+EF-14
+Créer un avoir lié à une facture
+S
+EF-15
+Visualiser et imprimer/exporter la facture au format lisible (PDF)
+C
+
+4.4 Calculs automatiques
+Réf.
+Exigence
+Priorité
+EF-16
+Calcul du montant HT de chaque ligne (quantité × prix unitaire)
+M
+EF-17
+Application des remises, en pourcentage ou en montant, au niveau de la ligne et/ou de la facture
+M
+EF-18
+Calcul de la TVA par taux, avec ventilation par taux sur la facture
+M
+EF-19
+Calcul du total HT, du total de TVA et du total TTC
+M
+EF-20
+Calcul de la marge par ligne, par facture et par période (marge = HT après remise – coût d'achat ; taux de marge = marge / HT)
+M
+EF-21
+Recalcul automatique et immédiat à chaque modification des lignes
+M
+
+4.5 Suivi des paiements
+Réf.
+Exigence
+Priorité
+EF-22
+Enregistrer un paiement (date, montant, mode : virement, chèque, espèces, carte) sur une facture
+M
+EF-23
+Gérer les paiements partiels et calculer le reste à payer
+M
+EF-24
+Mettre à jour automatiquement le statut de la facture (partiellement payée / payée)
+M
+EF-25
+Lister les factures impayées et en retard d'échéance
+M
+EF-26
+Refuser un paiement supérieur au reste à payer
+M
+
+4.6 Écritures comptables
+Réf.
+Exigence
+Priorité
+EF-27
+Générer automatiquement les écritures à la validation d'une facture de vente (débit 411 Clients ; crédit 706 Prestations / 707 Ventes ; crédit 44571 TVA collectée)
+M
+EF-28
+Générer les écritures d'encaissement à chaque paiement (débit 512 Banque ou 530 Caisse ; crédit 411 Clients)
+M
+EF-29
+Vérifier l'équilibre de chaque écriture (total débit = total crédit)
+M
+EF-30
+Consulter le journal des ventes, le journal de banque et la balance simplifiée
+S
+EF-31
+Exporter les écritures comptables (CSV ou JSON)
+S
+EF-32
+Paramétrer le plan comptable (comptes utilisés)
+C
+
+4.7 Export JSON
+Réf.
+Exigence
+Priorité
+EF-33
+Exporter une facture (ou une sélection de factures) en JSON structuré : émetteur, client, lignes, remises, TVA, totaux, paiements
+M
+EF-34
+Valider le fichier JSON généré (structure et champs obligatoires)
+S
+
+4.8 Facture électronique XML/UBL
+Réf.
+Exigence
+Priorité
+EF-35
+Générer une facture électronique au format XML UBL (Universal Business Language) à partir d'une facture validée
+M
+EF-36
+Renseigner les rubriques obligatoires : identifiants, dates, parties (vendeur/acheteur), lignes, taxes, totaux, conditions de paiement
+M
+EF-37
+Contrôler la conformité du XML (schéma XSD et règles de cohérence des montants) avant toute transmission
+S
+EF-38
+Enregistrer le fichier XML généré et le rattacher à la facture
+M
+
+4.9 Plateforme de facturation électronique fictive
+Réf.
+Exigence
+Priorité
+EF-39
+Simuler la transmission d'une facture électronique vers une plateforme fictive
+M
+EF-40
+Simuler un retour de la plateforme : acceptée ou rejetée, avec un motif en cas de rejet (ex. XML invalide, SIRET inconnu, montants incohérents)
+M
+EF-41
+Le retour est déterminé par des règles de contrôle réelles (voir 5.4) et, en option, par un mode « forcer le résultat » pour la démonstration
+S
+EF-42
+Mettre à jour le statut de la facture selon le retour (acceptée / rejetée)
+M
+EF-43
+Permettre de corriger puis retransmettre une facture rejetée
+S
+
+4.10 Historique des transmissions
+Réf.
+Exigence
+Priorité
+EF-44
+Consulter l'historique : facture, date et heure, statut, motif de rejet éventuel, fichier envoyé
+M
+EF-45
+Filtrer par période, par client, par statut
+S
+EF-46
+L'historique est non modifiable (traçabilité)
+M
+
+5. Règles de gestion
+5.1 Calculs
+Montant HT d'une ligne = quantité × prix unitaire HT – remise de ligne.
+La TVA est calculée par taux sur la base HT de chaque taux, puis arrondie au centime. Les taux de TVA sont paramétrables (par exemple 20 %, 10 %, 5,5 %, 2,1 %, 0 %) et non codés en dur.
+Total TTC = total HT + total TVA.
+Marge = montant HT après remise – (quantité × coût d'achat HT).
+Tous les montants financiers utilisent le type BigDecimal (pas double !) avec arrondi HALF UP à 2 décimales.
+5.2 Numérotation et immutabilité
+Les numéros de facture sont uniques, séquentiels et sans trou.
+Une facture validée ne peut être ni modifiée ni supprimée ; seule la création d'un avoir est possible.
+5.3 Cycle de vie d'une facture
+Brouillon → Validée → Transmise → Acceptée ou Rejetée. En parallèle, le règlement fait évoluer la facture vers Payée partiellement puis Payée. Une facture rejetée peut être corrigée et retransmise.
+5.4 Contrôles de la plateforme fictive
+La plateforme simulée rejette une facture notamment si :
+le XML n'est pas valide ou ne respecte pas le schéma ;
+le SIRET du vendeur ou de l'acheteur est absent ou mal formé ;
+la somme des lignes ne correspond pas aux totaux ;
+la date d'échéance est antérieure à la date d'émission ;
+Le numéro de facture a déjà été transmis.
+Dans les autres cas, la facture est acceptée.
+5.5 Comptabilité
+Toute écriture est équilibrée et rattachée à une pièce (facture ou paiement).
+Les écritures générées ne sont pas modifiables ; une correction passe par une écriture d'extourne.
+6. Exigences non fonctionnelles
+Catégorie
+Exigence
+Ergonomie
+Interface claire, navigation par menus/onglets, messages d'erreur compréhensibles, saisie guidée
+Performance
+Ouverture d'un écran en moins de 2 secondes ; recalcul d'une facture en moins de 500 ms pour 100 lignes
+Fiabilité
+Transactions en base pour garantir la cohérence (facture + écritures) ; aucune perte de données en cas de fermeture inattendue
+Intégrité
+Contraintes d'intégrité référentielle en base ; validation des saisies côté application
+Sécurité
+Authentification locale par mot de passe haché (ex. BCrypt) ; requêtes SQL préparées (anti-injection) ; sauvegarde de la base
+Portabilité
+Fonctionnement sous Windows et Linux avec un JRE [17 ou supérieur]
+Maintenabilité
+Code commenté, architecture en couches, tests unitaires, conventions de nommage Java
+Conformité
+Respect du RGPD pour les données clients (minimisation, droit de suppression/archivage)
+
+7. Contraintes et choix techniques
+Élément
+Choix proposé
+Langage
+Java [17 ou 21]
+Interface graphique
+JavaFX (ou Swing)
+SGBDR
+[MySQL / MariaDB / PostgreSQL / SQLite]
+Accès aux données
+JDBC avec pattern DAO (ou JPA/Hibernate)
+JSON
+Jackson ou Gson
+XML/UBL
+JAXB ou DOM/StAX, validation par schémas XSD UBL 2.1
+Gestion de projet et build
+Maven ou Gradle ; Git pour le versionnement
+Tests
+JUnit 5 (+ Mockito)
+Modélisation
+UML (cas d'utilisation, classes, séquence), MCD/MLD
+
+8. Architecture logicielle
+Architecture en couches (MVC ou 3 couches) :
+Présentation : écrans JavaFX et contrôleurs.
+Métier (services) : calculs, règles de gestion, génération des écritures, génération JSON/UBL, simulation de la plateforme.
+Accès aux données (DAO) : requêtes SQL, transactions.
+Modèle : classes Client, Produit, Facture, LigneFacture, Paiement, EcritureComptable, Transmission.
+Organisation des paquetages conseillée : model, dao, service, ui, export, plateforme, util.
+9. Modèle de données (principales entités)
+Entité
+Attributs principaux
+Client
+id, raison sociale, adresse, SIRET, n° TVA, e-mail, téléphone, délai de paiement, actif
+Produit
+id, référence, désignation, type, prix de vente HT, coût d'achat HT, taux de TVA, unité, actif
+Facture
+id, numéro, date d'émission, date d'échéance, client, statut, total HT, total TVA, total TTC, remise globale
+LigneFacture
+id, facture, produit, désignation, quantité, prix unitaire, remise, taux de TVA, total HT ligne
+Paiement
+id, facture, date, montant, mode de paiement
+EcritureComptable
+id, date, journal, compte, libellé, débit, crédit, pièce (facture/paiement)
+Transmission
+id, facture, date/heure, statut (envoyée, acceptée, rejetée), motif, chemin du fichier XML
+Taux de TVA (paramètre)
+id, libellé, taux
+
+Relations principales : un client a plusieurs factures ; une facture a plusieurs lignes, plusieurs paiements, plusieurs écritures et plusieurs transmissions ; une ligne référence un produit.
+10. Interfaces (écrans principaux)
+Connexion.
+Tableau de bord : chiffre d'affaires, factures impayées, marges, dernières transmissions.
+Clients : liste, recherche, fiche.
+Produits et prestations : catalogue et fiche.
+Factures : liste, création/édition avec calcul en direct, visualisation.
+Paiements : saisie et suivi du reste à payer.
+Comptabilité : journaux, écritures, balance.
+Exports : JSON, XML/UBL.
+Transmissions : envoi simulé, résultat, historique.
+Paramètres : coordonnées de l'entreprise, taux de TVA, plan comptable, numérotation.
+11. Qualité, tests et recette
+11.1 Stratégie de test
+Tests unitaires : calculs (HT, remises, TVA, TTC, marge, arrondis), génération des écritures, contrôles de la plateforme fictive.
+Tests d'intégration : DAO avec base de test, enchaînement facture → écritures → paiement.
+Tests fonctionnels : scénarios utilisateur complets sur l'interface.
+Tests de validation des formats : JSON conforme, XML valide par rapport au XSD UBL.
+11.2 Jeu d'essai (exemple)
+Facture avec deux lignes : 10 × 50,00 € HT à TVA 20 % avec 10 % de remise, et 1 × 200,00 € HT à TVA 10 %. Résultat attendu : HT 450,00 + 200,00 = 650,00 € ; TVA 90,00 + 20,00 = 110,00 € ; TTC 760,00 €. Les écritures (411, 706/707, 44571) doivent être équilibrées à 760,00 €.
+11.3 Critères de recette
+Toutes les exigences de priorité M sont réalisées et testées.
+Les scénarios de démonstration passent sans erreur : création client → produit → facture → validation → export JSON → génération UBL → transmission acceptée → paiement → écritures.
+Au moins un scénario de rejet est démontré (ex. SIRET invalide) avec correction et retransmission.
+12. Livrables
+Code source versionné (dépôt Git) et exécutable (JAR).
+Script de création et de peuplement de la base de données.
+Dossier de conception : cas d'utilisation, diagramme de classes, MCD/MLD, diagrammes de séquence.
+Jeux d'essai et rapport de tests.
+Documentation utilisateur (manuel d'utilisation) et documentation technique (installation, architecture).
+Exemples de fichiers générés (JSON et XML/UBL).
+Support de présentation pour la soutenance.
+13. Planning prévisionnel
+Phase
+Contenu
+Durée indicative
+1. Analyse
+Recueil du besoin, cahier des charges, cas d'utilisation
+[2 semaines]
+2. Conception
+Modèle de données, diagrammes UML, maquettes des écrans
+[2 semaines]
+3. Socle technique
+Projet Maven, base de données, DAO, authentification
+[2 semaines]
+4. Cœur métier
+Clients, produits, factures, calculs, paiements
+[4 semaines]
+5. Comptabilité
+Génération des écritures, journaux
+[2 semaines]
+6. Échanges
+Export JSON, génération UBL, plateforme fictive, historique
+[3 semaines]
+7. Tests et recette
+Tests, corrections, jeux d'essai
+[2 semaines]
+8. Documentation et soutenance
+Manuels, dossier, présentation
+[2 semaines]
+
+14. Risques et points de vigilance
+Risque
+Parade
+Erreurs d'arrondi sur les montants
+Utiliser BigDecimal, tests unitaires avec cas limites
+Complexité du format UBL
+Partir d'un exemple officiel, limiter aux rubriques obligatoires, valider avec le XSD
+Règles comptables mal maîtrisées
+Valider les schémas d'écriture avec l'enseignant de comptabilité
+Périmètre trop ambitieux
+Respecter les priorités M/S/C et livrer d'abord les fonctions indispensables
+Perte de données
+Sauvegardes régulières, transactions, dépôt Git
+
+15. Évolutions possibles
+Génération de factures PDF avec logo et mentions légales complètes.
+Gestion des devis et des commandes.
+Rapprochement bancaire et import de relevés.
+Connexion à une véritable plateforme de facturation électronique (format Factur-X).
+Mode multi-utilisateurs avec gestion des droits.
+
+
+
+Glossaire
+UBL : Universal Business Language, norme XML pour les documents commerciaux.
+TVA collectée : TVA facturée aux clients, à reverser à l'État.
+SGBDR : système de gestion de base de données relationnelle.
+DAO : Data Access Object, classe dédiée à l'accès aux données.
+Avoir : document qui annule ou corrige tout ou partie d'une facture.
+Écriture comptable : enregistrement d'une opération au débit et au crédit de comptes.
