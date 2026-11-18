@@ -1,0 +1,8 @@
+fr\monlogcompta\ui\MainView$1.class
+fr\monlogcompta\MonLogComptaApp.class
+fr\monlogcompta\model\SessionUser.class
+fr\monlogcompta\model\SessionUser$Role.class
+fr\monlogcompta\db\Database.class
+fr\monlogcompta\ui\MainView$2.class
+fr\monlogcompta\ui\MainView.class
+fr\monlogcompta\ui\LoginView.class
